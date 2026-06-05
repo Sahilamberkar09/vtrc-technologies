@@ -1,0 +1,107 @@
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap");
+@import "tailwindcss";
+
+/* ── DESIGN TOKENS ────────────────────────────────────── */
+@theme {
+  --font-display: "Syne", sans-serif;
+  --font-body: "Geist", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-primary: #000000;
+  --color-on-primary: #ffffff;
+  --color-background: #faf9f9;
+  --color-on-background: #1a1c1c;
+  --color-secondary: #5d5f5f;
+  --color-on-secondary: #ffffff;
+  --color-surface: #faf9f9;
+  --color-surface-container: #eeeeee;
+  --color-surface-container-low: #f4f3f3;
+  --color-surface-container-high: #e9e8e8;
+  --color-surface-container-highest: #e3e2e2;
+  --color-surface-dim: #dadada;
+  --color-on-surface: #1a1c1c;
+  --color-on-surface-variant: #444748;
+  --color-outline: #747878;
+  --color-outline-variant: #c4c7c7;
+
+  --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 0 0 1px rgba(0,0,0,0.05), 0 1px 3px 0 rgba(0,0,0,0.1);
+}
+
+/* ── BASE ─────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-background);
+  color: var(--color-on-background);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @apply selection:bg-black/10;
+}
+
+* {
+  cursor: default;
+}
+
+a, button {
+  cursor: pointer;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+/* ── BUTTONS ──────────────────────────────────────────── */
+@layer components {
+  .btn-primary {
+    @apply bg-black text-white border-2 border-black px-6 py-3 font-bold uppercase tracking-widest transition-all duration-200 rounded-lg;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .btn-primary:hover {
+    @apply bg-transparent text-black;
+  }
+
+  .btn-outline {
+    @apply bg-transparent text-black border-2 border-black px-6 py-3 font-bold uppercase tracking-widest transition-all duration-200 rounded-lg;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .btn-outline:hover {
+    @apply bg-black text-white;
+  }
+
+  .card-premium {
+    @apply bg-white border border-slate-200 p-6 transition-all duration-300 rounded-xl;
+  }
+}
+
+/* ── CUSTOM SCROLLBAR ─────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #000000;
+  border-radius: 10px;
+}
+
+/* ── ANIMATIONS ───────────────────────────────────────── */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -1,0 +1,39 @@
+<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(0.9); }
+      50% { transform: scale(1.1); }
+    }
+    .logo-container {
+      transform-origin: center;
+      animation: pulse 3s infinite ease-in-out;
+    }
+    .logo-inner {
+      transform-origin: center;
+      /* Optional: add rotation if you want more movement */
+      /* animation: rotate 10s infinite linear; */
+    }
+  </style>
+  
+  <!-- Circular White Background -->
+  <circle cx="32" cy="32" r="30" fill="white" stroke="#eeeeee" stroke-width="1" />
+  
+  <g class="logo-container">
+    <g transform="translate(10, 16) scale(0.8)">
+      <!-- Left V Shape -->
+      <path d="M0 4 H10 L18 36 H8 Z" fill="black" />
+      
+      <!-- Right Tech Shape -->
+      <path d="M18 36 L28 10 L44 2 L40 14 L30 18 L26 30 Z" fill="#444444" />
+
+      <!-- Nodes -->
+      <circle cx="28" cy="10" r="4.5" fill="#444444" />
+      <circle cx="44" cy="2"  r="4.5" fill="#888888" />
+      <circle cx="40" cy="14" r="4" fill="#444444" />
+    </g>
+  </g>
+</svg>
