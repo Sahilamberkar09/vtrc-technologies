@@ -25,20 +25,38 @@ export const sendMail = async ({ to, subject, text, html }) => {
 
   console.log(`✉️ Sending email via Resend from: ${from} to: ${to}`);
 
-  const { data, error } = await resend.emails.send({
-    from,
-    to,
-    subject,
-    text,
-    html,
-  });
+  try {
+    const { data, error } = await resend.emails.send({
+      from,
+      to,
+      subject,
+      text,
+      html,
+    });
 
-  if (error) {
-    console.error("Resend API Error:", error);
-    throw new Error(error.message || "Failed to send email via Resend.");
+    if (error) {
+      if (error.message && error.message.includes("You can only send testing emails")) {
+        console.warn(`⚠️ Resend Sandbox restriction: Cannot send email to ${to}.`);
+        console.warn(`🔑 OTP / Email Details:\nSubject: ${subject}\nText: ${text}`);
+        return {
+          messageId: `mock-resend-id-${Date.now()}`,
+        };
+      }
+      console.error("Resend API Error:", error);
+      throw new Error(error.message || "Failed to send email via Resend.");
+    }
+
+    return {
+      messageId: data?.id,
+    };
+  } catch (error) {
+    if (error.message && error.message.includes("You can only send testing emails")) {
+      console.warn(`⚠️ Resend Sandbox restriction: Cannot send email to ${to}.`);
+      console.warn(`🔑 OTP / Email Details:\nSubject: ${subject}\nText: ${text}`);
+      return {
+        messageId: `mock-resend-id-${Date.now()}`,
+      };
+    }
+    throw error;
   }
-
-  return {
-    messageId: data?.id,
-  };
 };
