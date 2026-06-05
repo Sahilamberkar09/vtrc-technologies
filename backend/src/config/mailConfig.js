@@ -16,7 +16,7 @@ export const sendMail = async ({ to, subject, text, html }) => {
   // Resend restricts from address to verified domains (or onboarding@resend.dev for testing).
   // We fall back to onboarding@resend.dev if a @gmail.com address is configured as EMAIL_FROM.
   const isGmail = emailUser && emailUser.toLowerCase().includes("@gmail.com");
-  const fromEmail = (!emailUser || isGmail) ? "onboarding@resend.dev" : emailUser;
+  const fromEmail = "onboarding@resend.dev" ;
   const from = `VTRC Technologies <${fromEmail}>`;
 
   if (isGmail) {
