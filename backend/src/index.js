@@ -15,7 +15,7 @@ import userRouter from "./features/user/user.route.js";
 import quotationRouter from "./features/quotation/quotation.route.js";
 import blogRouter from "./features/blog/blog.route.js";
 import careerRouter from "./features/career/career.route.js";
-import otpRouter from "./features/otp/otpRoutes.js";
+import otpRouter from "./features/otp/otp.route.js";
 
 dotenv.config();
 
@@ -25,7 +25,6 @@ app.use(
       "http://localhost:5173",
       "http://localhost:5174",
       "https://vtrc-technologies.vercel.app",
-      "https://vtrc-technologies-tau.vercel.app",
       "https://vtrc-technologies-admin.vercel.app",
       process.env.FRONTEND_URL,
       process.env.ADMIN_URL,

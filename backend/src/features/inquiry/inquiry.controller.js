@@ -1,5 +1,6 @@
 import Inquiry from "./Inquiry.js";
 import ProjectInquiry from "./ProjectInquiry.js";
+import { otpStore } from "../otp/otp.controller.js";
 
 // ── GENERAL INQUIRIES ──────────────────────────────────
 
@@ -9,6 +10,16 @@ export const createInquiry = async (req, res) => {
     if (!name || !email || !phone || !message) {
       return res.status(400).json({ success: false, message: "Please provide all fields" });
     }
+
+    // ── OTP Guard: email must be verified ──────────────
+    const otpRecord = otpStore.get(email.toLowerCase());
+    if (!otpRecord || !otpRecord.verified) {
+      return res.status(403).json({
+        success: false,
+        message: "Email not verified. Please verify your email with OTP before submitting.",
+      });
+    }
+
     const inquiry = await Inquiry.create({
       name,
       email,
@@ -16,6 +27,10 @@ export const createInquiry = async (req, res) => {
       message,
       selectedPlan: selectedPlan || "General",
     });
+
+    // Clear the OTP record after successful submission
+    otpStore.delete(email.toLowerCase());
+
     res.status(201).json({ success: true, data: inquiry });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

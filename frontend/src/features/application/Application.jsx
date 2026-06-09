@@ -21,72 +21,13 @@ const Application = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
-  const [otp, setOtp] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
-  const [emailVerified, setEmailVerified] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
-  const [otpLoading, setOtpLoading] = useState(false);
-  const [verifyLoading, setVerifyLoading] = useState(false);
-  const [otpError, setOtpError] = useState('');
 
-  // Strict email validation — must have @ and a real domain (e.g. @gmail.com)
-  const validateEmail = (email) => {
-    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return regex.test(email);
-  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  useEffect(() => {
-    let timer;
-    if (cooldown > 0) {
-      timer = setInterval(() => setCooldown((prev) => prev - 1), 1000);
-    }
-    return () => clearInterval(timer);
-  }, [cooldown]);
 
-  const handleSendOtp = async () => {
-    if (!validateEmail(formData.email)) {
-      setOtpError('Please enter a valid email address (e.g. name@example.com)');
-      return;
-    }
-    setOtpLoading(true);
-    setOtpError('');
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/otp/send-email-otp`, { email: formData.email });
-      if (res.data.success) {
-        setOtpSent(true);
-        setCooldown(30);
-      }
-    } catch (err) {
-      setOtpError(err.response?.data?.message || 'Failed to send OTP.');
-    } finally {
-      setOtpLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (!otp) {
-      setOtpError('Please enter the OTP.');
-      return;
-    }
-    setVerifyLoading(true);
-    setOtpError('');
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/otp/verify-email-otp`, { email: formData.email, otp });
-      if (res.data.success) {
-        setEmailVerified(true);
-        setOtpSent(false); // Hide OTP input
-        setOtp('');
-      }
-    } catch (err) {
-      setOtpError(err.response?.data?.message || 'Invalid OTP.');
-    } finally {
-      setVerifyLoading(false);
-    }
-  };
 
   const handleFileChange = (e) => {
     setFormData({ ...formData, resume: e.target.files[0] });
@@ -96,10 +37,7 @@ const Application = () => {
     e.preventDefault();
     setError('');
 
-    if (!emailVerified) {
-      setError('Please verify your email address before submitting.');
-      return;
-    }
+
     if (!formData.resume) {
       setError('Please upload your resume file (PDF/DOCX).');
       return;
@@ -133,9 +71,7 @@ const Application = () => {
           resume: null,
           jobId: formData.jobId || ''
         });
-        setEmailVerified(false);
-        setOtpSent(false);
-        setOtp('');
+
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (err) {
@@ -230,56 +166,15 @@ const Application = () => {
             {/* Email */}
             <div className="flex flex-col gap-2">
               <label className="font-['JetBrains_Mono'] text-[12px] font-medium uppercase tracking-widest text-[#747878]" htmlFor="email">02_EMAIL_ADDRESS</label>
-              <div className="flex items-center border-b-2 border-black focus-within:border-b-4 transition-all">
-                <input 
-                  className="bg-transparent border-none focus:ring-0 px-0 py-4 font-['Syne'] text-[32px] font-bold placeholder:text-[#e3e2e2] transition-colors outline-none w-full disabled:opacity-50 disabled:cursor-not-allowed" 
-                  id="email" 
-                  placeholder="user@gmail.com" 
-                  type="email"
-                  required
-                  disabled={emailVerified}
-                  value={formData.email}
-                  onChange={(e) => {
-                    setFormData({ ...formData, email: e.target.value });
-                    setEmailVerified(false);
-                    setOtpSent(false);
-                  }}
-                />
-                {emailVerified ? (
-                  <span className="font-['JetBrains_Mono'] text-[12px] font-bold text-green-600 uppercase whitespace-nowrap px-4">Verified</span>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleSendOtp}
-                    disabled={otpLoading || cooldown > 0 || !formData.email}
-                    className="font-['JetBrains_Mono'] text-[12px] font-bold text-white bg-black px-4 py-2 uppercase disabled:opacity-50 whitespace-nowrap"
-                  >
-                    {otpLoading ? 'Sending...' : cooldown > 0 ? `Wait ${cooldown}s` : 'Send OTP'}
-                  </button>
-                )}
-              </div>
-              {otpError && <p className="font-['JetBrains_Mono'] text-[12px] text-red-600 mt-1 font-bold tracking-widest uppercase">{otpError}</p>}
-              
-              {otpSent && !emailVerified && (
-                <div className="flex items-center gap-2 mt-4">
-                  <input
-                    type="text"
-                    maxLength="6"
-                    placeholder="ENTER 6-DIGIT OTP"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                    className="w-full bg-transparent border-b-2 border-black py-2 font-['Syne'] text-[18px] font-bold text-black placeholder:text-[#e3e2e2] focus:outline-none focus:border-b-4 transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleVerifyOtp}
-                    disabled={verifyLoading || otp.length !== 6}
-                    className="font-['JetBrains_Mono'] text-[12px] font-bold text-white bg-black px-4 py-2 uppercase disabled:opacity-50 whitespace-nowrap"
-                  >
-                    {verifyLoading ? 'Verifying...' : 'Verify'}
-                  </button>
-                </div>
-              )}
+              <input 
+                className="bg-transparent border-b-2 border-black focus:border-black focus:ring-0 px-0 py-4 font-['Syne'] text-[32px] font-bold placeholder:text-[#e3e2e2] transition-colors outline-none w-full" 
+                id="email" 
+                placeholder="user@gmail.com" 
+                type="email"
+                required
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              />
             </div>
           </div>
 
