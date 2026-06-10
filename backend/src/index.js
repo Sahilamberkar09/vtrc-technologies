@@ -16,7 +16,10 @@ import quotationRouter from "./features/quotation/quotation.route.js";
 import blogRouter from "./features/blog/blog.route.js";
 import careerRouter from "./features/career/career.route.js";
 import otpRouter from "./features/otp/otp.route.js";
+import dns from "dns";
 
+
+dns.setDefaultResultOrder('ipv4first');
 dotenv.config();
 
 app.use(

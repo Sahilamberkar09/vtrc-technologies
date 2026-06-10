@@ -5,26 +5,46 @@ const otpStore = new Map();
 
 const OTP_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
 
+// ── HELPERS ───────────────────────────────────────────────
+
 // Generate a 6-digit OTP
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// Create transporter — works on Render (Gmail SMTP via port 587 + TLS)
-function createTransporter() {
-  return nodemailer.createTransport({
+// Send an email via Gmail SMTP (works on Render/cloud via port 587 + STARTTLS)
+async function sendMail({ to, subject, html }) {
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+
+  if (!emailUser || !emailPass) {
+    throw new Error("Missing EMAIL_USER or EMAIL_PASS in environment variables.");
+  }
+
+  const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
-    secure: false,       // STARTTLS — not raw SSL, required for port 587
-    requireTLS: true,    // Force upgrade to TLS — essential for Render/cloud
+    secure: false,     // STARTTLS — not raw SSL, required for port 587
+    requireTLS: true,  // Force upgrade to TLS — essential for cloud deployments
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS, // Gmail App Password (not your account password)
+      user: emailUser,
+      pass: emailPass, // Gmail App Password (not your account password)
     },
     tls: {
       rejectUnauthorized: true,
     },
+    family: 4,
   });
+
+  const info = await transporter.sendMail({
+    from: `"VTRC Technologies" <${emailUser}>`,
+    to,
+    subject,
+    html,
+  });
+
+  console.log(`✉️ Email sent to ${to} — MessageId: ${info.messageId}`);
+  return { messageId: info.messageId };
 }
 
 // ── SEND OTP ──────────────────────────────────────────────
@@ -44,13 +64,7 @@ export const sendOtp = async (req, res) => {
     // Store OTP (overwrites any previous one for this email)
     otpStore.set(email.toLowerCase(), { code, expiresAt, verified: false });
 
-    const fromName = "VTRC Technologies";
-    const fromEmail = process.env.EMAIL_USER;
-
-    const transporter = createTransporter();
-
-    await transporter.sendMail({
-      from: `"${fromName}" <${fromEmail}>`,
+    await sendMail({
       to: email,
       subject: "Your OTP Code — VTRC Technologies",
       html: `
