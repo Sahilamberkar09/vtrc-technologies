@@ -18,14 +18,16 @@ async function sendMail({ to, subject, html }) {
   const emailPass = process.env.EMAIL_PASS;
 
   if (!emailUser || !emailPass) {
-    throw new Error("Missing EMAIL_USER or EMAIL_PASS in environment variables.");
+    throw new Error(
+      "Missing EMAIL_USER or EMAIL_PASS in environment variables.",
+    );
   }
 
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
-    secure: false,     // STARTTLS — not raw SSL, required for port 587
-    requireTLS: true,  // Force upgrade to TLS — essential for cloud deployments
+    secure: false, // STARTTLS — not raw SSL, required for port 587
+    requireTLS: true, // Force upgrade to TLS — essential for cloud deployments
     auth: {
       user: emailUser,
       pass: emailPass, // Gmail App Password (not your account password)
@@ -42,6 +44,8 @@ async function sendMail({ to, subject, html }) {
     subject,
     html,
   });
+  await transporter.verify();
+  console.log("SMTP Connected Successfully");
 
   console.log(`✉️ Email sent to ${to} — MessageId: ${info.messageId}`);
   return { messageId: info.messageId };
@@ -55,7 +59,10 @@ export const sendOtp = async (req, res) => {
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       return res
         .status(400)
-        .json({ success: false, message: "Please provide a valid email address." });
+        .json({
+          success: false,
+          message: "Please provide a valid email address.",
+        });
     }
 
     const code = generateOtp();
@@ -98,7 +105,12 @@ export const sendOtp = async (req, res) => {
     });
   } catch (error) {
     console.error("sendOtp error:", error);
-    res.status(500).json({ success: false, message: "Failed to send OTP email. Please try again." });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to send OTP email. Please try again.",
+      });
   }
 };
 
@@ -118,14 +130,20 @@ export const verifyOtp = async (req, res) => {
     if (!record) {
       return res
         .status(400)
-        .json({ success: false, message: "No OTP found for this email. Please request a new one." });
+        .json({
+          success: false,
+          message: "No OTP found for this email. Please request a new one.",
+        });
     }
 
     if (Date.now() > record.expiresAt) {
       otpStore.delete(email.toLowerCase());
       return res
         .status(400)
-        .json({ success: false, message: "OTP has expired. Please request a new one." });
+        .json({
+          success: false,
+          message: "OTP has expired. Please request a new one.",
+        });
     }
 
     if (record.code !== code.trim()) {
@@ -137,7 +155,9 @@ export const verifyOtp = async (req, res) => {
     // Mark as verified
     otpStore.set(email.toLowerCase(), { ...record, verified: true });
 
-    return res.status(200).json({ success: true, message: "Email verified successfully." });
+    return res
+      .status(200)
+      .json({ success: true, message: "Email verified successfully." });
   } catch (error) {
     console.error("verifyOtp error:", error);
     res.status(500).json({ success: false, message: "Internal server error." });
