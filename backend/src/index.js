@@ -130,7 +130,7 @@ app.get("/smtp-test", (req, res) => {
 });
 
 app.get("/smtp-test-587", (req, res) => {
-  const socket = require("net").createConnection({
+  const socket = net.createConnection({
     host: "smtp.gmail.com",
     port: 587,
   });
