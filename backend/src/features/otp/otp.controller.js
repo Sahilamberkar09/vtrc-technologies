@@ -25,18 +25,19 @@ async function sendMail({ to, subject, html }) {
 
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // STARTTLS — not raw SSL, required for port 587
-    requireTLS: true, // Force upgrade to TLS — essential for cloud deployments
+    port: 465,
+    secure: true,
+    family: 4,
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 15000,
     auth: {
       user: emailUser,
-      pass: emailPass, // Gmail App Password (not your account password)
+      pass: emailPass,
     },
-    tls: {
-      rejectUnauthorized: true,
-    },
-    family: 4,
   });
+  await transporter.verify();
+  console.log("SMTP Connected Successfully");
 
   const info = await transporter.sendMail({
     from: `"VTRC Technologies" <${emailUser}>`,
@@ -44,8 +45,6 @@ async function sendMail({ to, subject, html }) {
     subject,
     html,
   });
-  await transporter.verify();
-  console.log("SMTP Connected Successfully");
 
   console.log(`✉️ Email sent to ${to} — MessageId: ${info.messageId}`);
   return { messageId: info.messageId };
@@ -57,12 +56,10 @@ export const sendOtp = async (req, res) => {
     const { email } = req.body;
 
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Please provide a valid email address.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a valid email address.",
+      });
     }
 
     const code = generateOtp();
@@ -105,12 +102,10 @@ export const sendOtp = async (req, res) => {
     });
   } catch (error) {
     console.error("sendOtp error:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to send OTP email. Please try again.",
-      });
+    res.status(500).json({
+      success: false,
+      message: "Failed to send OTP email. Please try again.",
+    });
   }
 };
 
@@ -128,22 +123,18 @@ export const verifyOtp = async (req, res) => {
     const record = otpStore.get(email.toLowerCase());
 
     if (!record) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "No OTP found for this email. Please request a new one.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "No OTP found for this email. Please request a new one.",
+      });
     }
 
     if (Date.now() > record.expiresAt) {
       otpStore.delete(email.toLowerCase());
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "OTP has expired. Please request a new one.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "OTP has expired. Please request a new one.",
+      });
     }
 
     if (record.code !== code.trim()) {
