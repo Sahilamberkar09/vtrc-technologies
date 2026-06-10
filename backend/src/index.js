@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dns from "node:dns";
 import dnsPromises from "node:dns/promises";
+import net from "node:net";
 
 import connectDB from "./config/db.js";
 import { app, server } from "./config/socket.js";
@@ -94,6 +95,28 @@ app.get("/dns-test", async (req, res) => {
       error: error.message,
     });
   }
+});
+
+app.get("/smtp-test", async (req, res) => {
+  const socket = net.createConnection({
+    host: "142.251.188.108",
+    port: 465,
+  });
+
+  socket.on("connect", () => {
+    res.json({
+      success: true,
+      message: "Connected to Gmail SMTP",
+    });
+    socket.destroy();
+  });
+
+  socket.on("error", (err) => {
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
+  });
 });
 
 // Start Server
