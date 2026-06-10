@@ -97,22 +97,32 @@ app.get("/dns-test", async (req, res) => {
   }
 });
 
-app.get("/smtp-test", async (req, res) => {
+app.get("/smtp-test", (req, res) => {
   const socket = net.createConnection({
     host: "142.251.188.108",
     port: 465,
   });
 
+  socket.setTimeout(10000);
+
   socket.on("connect", () => {
-    res.json({
+    socket.destroy();
+    return res.json({
       success: true,
       message: "Connected to Gmail SMTP",
     });
+  });
+
+  socket.on("timeout", () => {
     socket.destroy();
+    return res.status(500).json({
+      success: false,
+      error: "Connection timed out",
+    });
   });
 
   socket.on("error", (err) => {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: err.message,
     });
