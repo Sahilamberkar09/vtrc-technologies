@@ -129,6 +129,37 @@ app.get("/smtp-test", (req, res) => {
   });
 });
 
+app.get("/smtp-test-587", (req, res) => {
+  const socket = require("net").createConnection({
+    host: "smtp.gmail.com",
+    port: 587,
+  });
+
+  socket.setTimeout(10000);
+
+  socket.on("connect", () => {
+    socket.destroy();
+    res.json({
+      success: true,
+      message: "Connected to port 587",
+    });
+  });
+
+  socket.on("timeout", () => {
+    socket.destroy();
+    res.status(500).json({
+      success: false,
+      error: "Timeout on port 587",
+    });
+  });
+
+  socket.on("error", (err) => {
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
+  });
+});
 // Start Server
 const PORT = process.env.PORT || 5000;
 
