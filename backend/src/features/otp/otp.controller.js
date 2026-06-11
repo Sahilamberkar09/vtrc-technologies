@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 // In-memory OTP store: email -> { code, expiresAt, verified }
 const otpStore = new Map();
@@ -12,42 +12,33 @@ function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// Send an email via Gmail SMTP (works on Render/cloud via port 587 + STARTTLS)
+// Send an email via Resend
 async function sendMail({ to, subject, html }) {
-  const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS;
+  const apiKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.FROM_EMAIL;
 
-  if (!emailUser || !emailPass) {
+  if (!apiKey || !fromEmail) {
     throw new Error(
-      "Missing EMAIL_USER or EMAIL_PASS in environment variables.",
+      "Missing RESEND_API_KEY or FROM_EMAIL in environment variables.",
     );
   }
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    family: 4,
-    connectionTimeout: 15000,
-    greetingTimeout: 15000,
-    socketTimeout: 15000,
-    auth: {
-      user: emailUser,
-      pass: emailPass,
-    },
-  });
-  await transporter.verify();
-  console.log("SMTP Connected Successfully");
+  const resend = new Resend(apiKey);
 
-  const info = await transporter.sendMail({
-    from: `"VTRC Technologies" <${emailUser}>`,
+  const { data, error } = await resend.emails.send({
+    from: `VTRC Technologies <${fromEmail}>`,
     to,
     subject,
     html,
   });
 
-  console.log(`✉️ Email sent to ${to} — MessageId: ${info.messageId}`);
-  return { messageId: info.messageId };
+  if (error) {
+    console.error("Resend error:", error);
+    throw new Error(error.message);
+  }
+
+  console.log(`✉️ Email sent to ${to} — MessageId: ${data.id}`);
+  return { messageId: data.id };
 }
 
 // ── SEND OTP ──────────────────────────────────────────────
