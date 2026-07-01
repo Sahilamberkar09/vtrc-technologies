@@ -75,7 +75,7 @@ const AnimatedLogo = ({
           <motion.span
             key={letter}
             style={{
-              fontFamily: "'Syne', sans-serif",
+              fontFamily: "'Outfit', sans-serif",
               fontWeight: 800,
               fontSize,
               color: letterColor,

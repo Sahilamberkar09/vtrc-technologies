@@ -56,6 +56,29 @@ export const deleteInquiry = async (req, res) => {
   }
 };
 
+export const updateInquiryStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const allowedStatuses = ["unread", "read", "contacted"];
+    
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ success: false, message: "Invalid status value" });
+    }
+
+    const inquiry = await Inquiry.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true, runValidators: true }
+    );
+
+    if (!inquiry) return res.status(404).json({ success: false, message: "Inquiry not found" });
+    
+    res.status(200).json({ success: true, data: inquiry, message: "Status updated successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // ── PROJECT INQUIRIES ──────────────────────────────────
 
 export const createProjectInquiry = async (req, res) => {

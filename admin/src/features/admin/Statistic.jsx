@@ -34,7 +34,7 @@ const Statistic = () => {
         setDashboardData(response.data);
       } catch (err) {
         console.error("Error fetching stats:", err);
-        setError("Failed to load telemetry data.");
+        setError("Failed to load dashboard data.");
       } finally {
         setLoading(false);
       }
@@ -46,9 +46,9 @@ const Statistic = () => {
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center py-32 space-y-4">
-        <div className="w-10 h-10 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400 font-mono">
-          Loading Data...
+        <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-xs font-semibold text-slate-400">
+          Loading data...
         </p>
       </div>
     );
@@ -73,27 +73,27 @@ const Statistic = () => {
   const statCards = [
     {
       label: "Total Users",
+      sub: "Registered accounts",
       value: vitalStats.totalUsers,
-      icon: <Users size={20} />,
-      id: "US-01"
+      icon: <Users size={18} />,
     },
     {
       label: "Active Tasks",
+      sub: "In progress",
       value: vitalStats.activeTasks,
-      icon: <Zap size={20} />,
-      id: "PR-02"
+      icon: <Zap size={18} />,
     },
     {
       label: "Projects",
+      sub: "Total portfolio",
       value: vitalStats.totalProjects,
-      icon: <Briefcase size={20} />,
-      id: "DM-03"
+      icon: <Briefcase size={18} />,
     },
     {
       label: "Inquiries",
+      sub: "All time",
       value: vitalStats.totalInquiries,
-      icon: <Activity size={20} />,
-      id: "SL-04"
+      icon: <Activity size={18} />,
     },
   ];
 
@@ -104,15 +104,15 @@ const Statistic = () => {
         {statCards.map((stat, i) => (
           <div
             key={i}
-            className="group bg-white p-8 border border-slate-200 rounded-2xl hover:border-black transition-all duration-300 flex flex-col justify-between min-h-[200px] relative overflow-hidden"
+            className="group bg-white p-6 border border-slate-200 rounded-2xl hover:border-black transition-all duration-300 flex flex-col justify-between min-h-[160px] relative overflow-hidden"
           >
-            <div className="flex justify-between items-start mb-10 relative z-10">
-              <div className="space-y-2">
-                <p className="text-[10px] font-bold text-slate-400 font-mono uppercase tracking-widest">
-                  {stat.id}
-                </p>
-                <p className="text-sm font-black text-black font-display uppercase tracking-widest">
+            <div className="flex justify-between items-start mb-6 relative z-10">
+              <div className="space-y-0.5">
+                <p className="text-[13px] font-bold text-black font-display">
                   {stat.label}
+                </p>
+                <p className="text-xs text-slate-400">
+                  {stat.sub}
                 </p>
               </div>
               <div className="text-slate-400 group-hover:text-black transition-colors p-2.5 bg-slate-50 rounded-xl">
@@ -120,8 +120,8 @@ const Statistic = () => {
               </div>
             </div>
             <div className="flex items-baseline gap-3 relative z-10">
-              <p className="text-5xl font-black tracking-tighter font-display leading-none">
-                {stat.value.toString().padStart(2, '0')}
+              <p className="text-4xl lg:text-5xl font-black tracking-tighter font-display leading-none">
+                {stat.value.toString().padStart(2, "0")}
               </p>
               <div className="w-2 h-2 bg-black rounded-full opacity-10 group-hover:opacity-100 transition-opacity"></div>
             </div>
@@ -135,7 +135,7 @@ const Statistic = () => {
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <div className="flex items-center gap-3">
               <Terminal size={18} className="text-slate-400" />
-              <h2 className="font-extrabold text-xl font-display uppercase tracking-tight">
+              <h2 className="font-bold text-lg text-slate-900">
                 Recent Tasks
               </h2>
             </div>
@@ -155,23 +155,23 @@ const Statistic = () => {
                   className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-white border border-slate-200 rounded-2xl hover:border-black transition-all duration-300 group gap-4"
                 >
                   <div className="flex items-center gap-6 min-w-0">
-                    <div className="text-[10px] font-bold font-mono text-slate-300 group-hover:text-slate-900 transition-colors">
-                      {(idx + 1).toString().padStart(2, '0')}
+                    <div className="text-xs font-semibold text-slate-300 group-hover:text-slate-700 transition-colors tabular-nums">
+                      {(idx + 1).toString().padStart(2, "0")}
                     </div>
                     <div className="min-w-0">
-                      <p className="font-black text-sm uppercase font-display leading-tight truncate">
+                      <p className="font-semibold text-sm text-slate-900 leading-tight truncate">
                         {task.title}
                       </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 font-mono truncate">
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs text-slate-400 truncate">
                           {task.project}
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div className={`text-[9px] font-bold uppercase tracking-widest font-mono px-3 py-1.5 rounded-lg border transition-all whitespace-nowrap self-start sm:self-center ${
-                    task.status === "completed" 
-                      ? "bg-black text-white border-black" 
+                  <div className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all whitespace-nowrap self-start sm:self-center ${
+                    task.status === "completed"
+                      ? "bg-black text-white border-black"
                       : "bg-slate-50 text-slate-600 border-slate-200 group-hover:border-black group-hover:text-black"
                   }`}>
                     {task.status.replace("-", " ")}
@@ -187,7 +187,7 @@ const Statistic = () => {
           <section className="bg-white border border-slate-200 rounded-2xl p-8 space-y-6">
             <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
                <Layout size={16} className="text-slate-400" />
-               <h3 className="font-black text-[10px] uppercase tracking-widest font-mono">Category Matrix</h3>
+               <h3 className="font-bold text-sm text-slate-800">Projects by Category</h3>
             </div>
             
             <div className="space-y-2">
@@ -196,11 +196,11 @@ const Statistic = () => {
               ) : (
                 projectsByCategory.map((cat, idx) => (
                   <div key={idx} className="flex justify-between items-center p-4 bg-slate-50 rounded-xl border border-transparent hover:border-slate-200 transition-all group">
-                    <span className="text-xs font-black uppercase font-display tracking-tight text-slate-600 group-hover:text-black">
+                    <span className="text-xs font-semibold text-slate-600 group-hover:text-black">
                       {cat._id || "Unlabeled"}
                     </span>
-                    <span className="text-[10px] font-black font-mono px-2 py-0.5 bg-white border border-slate-200 rounded-md">
-                      {cat.count.toString().padStart(2, '0')}
+                    <span className="text-xs font-bold font-mono px-2 py-0.5 bg-white border border-slate-200 rounded-md">
+                      {cat.count.toString().padStart(2, "0")}
                     </span>
                   </div>
                 ))
@@ -215,18 +215,18 @@ const Statistic = () => {
             <div className="relative z-10 space-y-6">
               <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                  <Zap size={16} />
-                 <h3 className="font-black text-[10px] uppercase tracking-widest font-mono">Distribution</h3>
+                 <h3 className="font-bold text-sm">Task Breakdown</h3>
               </div>
               
               <div className="space-y-4">
                 {taskProjectBreakdown.slice(0, 4).map((project, idx) => (
                   <div key={idx} className="space-y-2 group">
                     <div className="flex justify-between items-end">
-                      <span className="text-[9px] font-bold uppercase tracking-widest truncate max-w-[70%] font-mono text-white/60 group-hover:text-white">
+                      <span className="text-xs font-semibold truncate max-w-[70%] text-white/60 group-hover:text-white">
                         {project._id || "General"}
                       </span>
-                      <span className="text-[9px] font-bold font-mono text-white/30">
-                        {project.count} UNITS
+                      <span className="text-xs font-semibold text-white/40">
+                        {project.count} tasks
                       </span>
                     </div>
                     <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">

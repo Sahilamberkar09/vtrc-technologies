@@ -42,6 +42,22 @@ const QuotationHistory = () => {
   const [viewingQuotation, setViewingQuotation] = useState(null);
   const [toast, setToast] = useState(null);
   const [editLoading, setEditLoading] = useState(null);
+  const [downloadLoading, setDownloadLoading] = useState(null);
+  const [downloadingQuotationData, setDownloadingQuotationData] = useState(null);
+
+  const fetchFullAndDownload = async (id) => {
+    setDownloadLoading(id);
+    try {
+      const res = await axios.get(`${serverUrl}/api/quotations/${id}`, {
+        withCredentials: true,
+      });
+      setDownloadingQuotationData(res.data.data);
+    } catch {
+      showToast("error", "Failed to load quotation for download.");
+    } finally {
+      setDownloadLoading(null);
+    }
+  };
 
   const showToast = (type, msg) => {
     setToast({ type, msg });
@@ -130,7 +146,7 @@ const QuotationHistory = () => {
             <div className="h-6 w-px bg-slate-200 hidden md:block"></div>
             <div className="flex flex-col">
               <span className="text-[10px] font-bold text-slate-400 font-mono uppercase tracking-widest">Modification</span>
-              <span className="text-xs font-black text-black font-display uppercase tracking-widest truncate max-w-[200px]">
+              <span className="text-xs font-black text-black font-display uppercase tracking-widest truncate max-w-50">
                 {editingQuotation.quotationNo}
               </span>
             </div>
@@ -252,6 +268,18 @@ const QuotationHistory = () => {
                   <Eye size={14} /> View
                 </button>
                 <button
+                  onClick={() => fetchFullAndDownload(q._id)}
+                  disabled={downloadLoading === q._id}
+                  className="flex-1 flex items-center justify-center gap-2 py-4 text-[10px] font-bold text-slate-600 hover:bg-black hover:text-white transition-all uppercase tracking-widest font-mono disabled:opacity-20"
+                >
+                  {downloadLoading === q._id ? (
+                    <RefreshCw size={14} className="animate-spin" />
+                  ) : (
+                    <Download size={14} />
+                  )}
+                  Download
+                </button>
+                <button
                   onClick={() => fetchFullAndEdit(q._id)}
                   disabled={editLoading === q._id}
                   className="flex-1 flex items-center justify-center gap-2 py-4 text-[10px] font-bold text-slate-600 hover:bg-black hover:text-white transition-all uppercase tracking-widest font-mono disabled:opacity-20"
@@ -278,7 +306,7 @@ const QuotationHistory = () => {
       {/* Detail Slide-over */}
       <AnimatePresence>
         {viewingQuotation && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-end bg-black/40 backdrop-blur-sm">
+          <div className="fixed inset-0 z-100 flex items-center justify-end bg-black/40 backdrop-blur-sm">
             <motion.div 
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
@@ -289,7 +317,7 @@ const QuotationHistory = () => {
               <div className="p-8 border-b border-slate-100 flex items-center justify-between h-24">
                 <div className="space-y-0.5">
                   <p className="text-[10px] font-bold text-slate-400 font-mono uppercase tracking-widest">Detail View</p>
-                  <h3 className="text-xl font-black font-display uppercase tracking-widest truncate max-w-[400px]">
+                  <h3 className="text-xl font-black font-display uppercase tracking-widest truncate max-w-100">
                     {viewingQuotation.quotationNo}
                   </h3>
                 </div>
@@ -365,6 +393,18 @@ const QuotationHistory = () => {
                   <Pencil size={14} /> Edit Record
                 </button>
                 <button
+                  onClick={() => fetchFullAndDownload(viewingQuotation._id)}
+                  disabled={downloadLoading === viewingQuotation._id}
+                  className="flex-1 flex items-center justify-center gap-3 py-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 hover:text-black text-[10px] font-bold uppercase tracking-widest font-mono rounded-xl transition-all disabled:opacity-20"
+                >
+                  {downloadLoading === viewingQuotation._id ? (
+                    <RefreshCw size={14} className="animate-spin" />
+                  ) : (
+                    <Download size={14} />
+                  )}
+                  Download
+                </button>
+                <button
                   onClick={() => setViewingQuotation(null)}
                   className="px-8 py-4 border border-slate-200 text-slate-500 rounded-xl hover:bg-slate-50 transition-all text-[10px] font-bold uppercase tracking-widest font-mono"
                 >
@@ -379,7 +419,7 @@ const QuotationHistory = () => {
       {/* Delete Confirmation Modal */}
       <AnimatePresence>
         {deleteId && (
-          <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
+          <div className="fixed inset-0 z-110 flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
             <motion.div 
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -423,7 +463,7 @@ const QuotationHistory = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className={`fixed bottom-8 right-8 z-[200] px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 font-mono text-[10px] font-bold uppercase tracking-widest ${
+            className={`fixed bottom-8 right-8 z-200 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 font-mono text-[10px] font-bold uppercase tracking-widest ${
               toast.type === "success" ? "bg-black text-white" : "bg-red-600 text-white"
             }`}
           >
@@ -436,6 +476,15 @@ const QuotationHistory = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      {downloadingQuotationData && (
+        <div style={{ position: "absolute", left: "-9999px", top: "-9999px", width: "210mm", height: "0", overflow: "hidden" }}>
+          <Quotation
+            editData={downloadingQuotationData}
+            autoDownload={true}
+            onDownloadComplete={() => setDownloadingQuotationData(null)}
+          />
+        </div>
+      )}
     </div>
   );
 };

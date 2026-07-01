@@ -27,18 +27,19 @@ import {
   Database,
   X,
   PlusCircle,
+  AlertTriangle,
 } from "lucide-react";
 import axios from "axios";
 import { userDataContext } from "../../context/UserContext";
 import { motion, AnimatePresence } from "framer-motion";
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 import jsPDF from "jspdf";
 
 const generateRandomQuotation = () => {
   return `VTRC-SPEC-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
 };
 
-const Quotation = ({ editData = null, onSaved = null }) => {
+const Quotation = ({ editData = null, onSaved = null, autoDownload = false, onDownloadComplete = null }) => {
   const { serverUrl } = useContext(userDataContext);
   const [activeTab, setActiveTab] = useState("edit");
   const [isExporting, setIsExporting] = useState(false);
@@ -159,23 +160,40 @@ const Quotation = ({ editData = null, onSaved = null }) => {
   const targetRef = useRef(null);
 
   const handleDownload = async () => {
+    let tempVisible = false;
+    let element = null;
+    let originalStyle = {};
     try {
       setIsExporting(true);
-      setActiveTab("preview");
 
-      // Wait for tab switch and DOM stability
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      const element = document.getElementById("quotation-print-area");
+      element = document.getElementById("quotation-print-area");
       if (!element) throw new Error("Print area not found");
 
-      // Scroll to top of the container
-      const container = element.parentElement;
-      if (container) container.scrollTop = 0;
-      window.scrollTo(0, 0);
+      if (activeTab !== "preview" && !autoDownload) {
+        tempVisible = true;
+        originalStyle = {
+          display: element.style.display,
+          position: element.style.position,
+          left: element.style.left,
+          top: element.style.top,
+          width: element.style.width,
+        };
+        element.style.display = "block";
+        element.style.position = "absolute";
+        element.style.left = "-9999px";
+        element.style.top = "-9999px";
+        element.style.width = "210mm";
+      }
 
-      // Brief pause for scroll to finish
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Scroll to top of the container if visible
+      if (!tempVisible && !autoDownload) {
+        const container = element.parentElement;
+        if (container) container.scrollTop = 0;
+        window.scrollTo(0, 0);
+      }
+
+      // Wait for DOM stability
+      await new Promise(resolve => setTimeout(resolve, tempVisible ? 100 : 800));
 
       const canvas = await html2canvas(element, {
         scale: 2,
@@ -229,11 +247,19 @@ const Quotation = ({ editData = null, onSaved = null }) => {
       pdf.save(filename);
     } catch (error) {
       console.error("PDF Export failed:", error);
-      // More reliable fallback: show alert then print
-      alert("Preparing browser print fallback for high-fidelity export.");
-      window.print();
+      showToast("error", "Failed to generate PDF document.");
     } finally {
+      if (tempVisible && element) {
+        element.style.display = originalStyle.display;
+        element.style.position = originalStyle.position;
+        element.style.left = originalStyle.left;
+        element.style.top = originalStyle.top;
+        element.style.width = originalStyle.width;
+      }
       setIsExporting(false);
+      if (onDownloadComplete) {
+        onDownloadComplete();
+      }
     }
   };
 
@@ -245,6 +271,12 @@ const Quotation = ({ editData = null, onSaved = null }) => {
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    if (autoDownload && editData && formData.quotationNo === editData.quotationNo) {
+      handleDownload();
+    }
+  }, [autoDownload, editData, formData.quotationNo]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -375,21 +407,19 @@ const Quotation = ({ editData = null, onSaved = null }) => {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className={`btn-primary flex-1 sm:flex-none sm:min-w-[160px] flex items-center justify-center gap-2 whitespace-nowrap ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`btn-primary flex-1 sm:flex-none sm:min-w-40 flex items-center justify-center gap-2 whitespace-nowrap ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {isSaving ? <RefreshCw className="animate-spin" size={16} /> : editData?._id ? <Pencil size={16} /> : <Save size={16} />}
             <span className="text-[10px] uppercase tracking-widest">{isSaving ? 'Saving...' : editData?._id ? 'Update Spec' : 'Save Spec'}</span>
           </button>
-          {activeTab === "preview" && (
-            <button
-              onClick={handleDownload}
-              disabled={isExporting}
-              className={`btn-outline flex-1 sm:flex-none sm:min-w-[160px] flex items-center justify-center gap-2 shadow-xl shadow-black/5 whitespace-nowrap ${isExporting ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <Download size={16} />
-              <span className="text-[10px] uppercase tracking-widest">{isExporting ? 'Exporting...' : 'Download PDF'}</span>
-            </button>
-          )}
+          <button
+            onClick={handleDownload}
+            disabled={isExporting}
+            className={`btn-outline flex-1 sm:flex-none sm:min-w-40 flex items-center justify-center gap-2 shadow-xl shadow-black/5 whitespace-nowrap ${isExporting ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <Download size={16} />
+            <span className="text-[10px] uppercase tracking-widest">{isExporting ? 'Exporting...' : 'Download PDF'}</span>
+          </button>
         </div>
       </div>
 
@@ -400,7 +430,7 @@ const Quotation = ({ editData = null, onSaved = null }) => {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 20, opacity: 0 }}
-            className={`fixed bottom-10 right-10 z-[200] flex items-center gap-4 px-6 py-4 rounded-xl shadow-2xl text-white text-[10px] font-bold uppercase tracking-widest ${toast.type === 'success' ? 'bg-black' : 'bg-red-600'
+            className={`fixed bottom-10 right-10 z-200 flex items-center gap-4 px-6 py-4 rounded-xl shadow-2xl text-white text-[10px] font-bold uppercase tracking-widest ${toast.type === 'success' ? 'bg-black' : 'bg-red-600'
               }`}>
             {toast.type === 'success' ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}
             {toast.msg}
@@ -409,7 +439,7 @@ const Quotation = ({ editData = null, onSaved = null }) => {
       </AnimatePresence>
 
       {isExporting && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-[100] flex items-center justify-center p-8 pointer-events-none print-exclude">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-100 flex items-center justify-center p-8 pointer-events-none print-exclude">
           <div className="flex flex-col items-center gap-6 p-12 bg-white rounded-3xl shadow-2xl max-w-md w-full border border-outline-variant pointer-events-auto">
             <RefreshCw className="animate-spin text-black" size={48} />
             <div className="text-center space-y-2">
@@ -421,7 +451,7 @@ const Quotation = ({ editData = null, onSaved = null }) => {
       )}
 
       <div className="flex-1 overflow-y-auto p-8 bg-background">
-        {activeTab === "edit" ? (
+        {activeTab === "edit" && (
           <div className="max-w-4xl mx-auto space-y-8">
             {/* Header Info */}
             <section className="bg-white p-10 border border-outline-variant rounded-3xl shadow-sm">
@@ -798,26 +828,30 @@ const Quotation = ({ editData = null, onSaved = null }) => {
 
 
           </div>
-        ) : (
-          /* Preview Mode */
-          <div
-            id="quotation-print-area"
-            className="w-[210mm] mx-auto bg-white overflow-hidden relative"
-            ref={targetRef}
-            style={{ minHeight: '297mm' }}
-          >
+        )}
+
+        {/* Preview Mode / Print Area */}
+        <div
+          id="quotation-print-area"
+          className="w-[210mm] mx-auto bg-white overflow-hidden relative"
+          ref={targetRef}
+          style={{ 
+            minHeight: '297mm',
+            display: (activeTab === "preview" || autoDownload) ? "block" : "none" 
+          }}
+        >
             {/* Dedicated PDF Style Overrides */}
             <style dangerouslySetInnerHTML={{
               __html: `
               [data-pdf-content] {
-                font-family: 'Geist', sans-serif !important;
+                font-family: 'Plus Jakarta Sans', sans-serif !important;
                 -webkit-print-color-adjust: exact;
                 width: 210mm;
                 margin: 0;
                 background: white;
               }
               [data-pdf-content] h1, [data-pdf-content] h2, [data-pdf-content] h3, [data-pdf-content] h4 {
-                font-family: 'Syne', sans-serif !important;
+                font-family: 'Outfit', sans-serif !important;
                 letter-spacing: -0.02em;
               }
               [data-pdf-content] .font-mono {
@@ -838,6 +872,9 @@ const Quotation = ({ editData = null, onSaved = null }) => {
                 <div className="flex justify-between items-start relative z-10">
                   <div className="space-y-6">
                     <div className="flex items-center gap-3">
+                      <div className="bg-white p-1 rounded-lg flex items-center justify-center shadow-sm">
+                        <img src="/VTRCLogo.png" alt="VTRC Logo" className="h-6 w-auto object-contain" />
+                      </div>
                       <span className="text-2xl font-black tracking-tighter uppercase font-display">VTRC</span>
                     </div>
                     <div className="space-y-2">
@@ -929,7 +966,7 @@ const Quotation = ({ editData = null, onSaved = null }) => {
 
 
                 {/* Terms & Conditions - PDF ONLY COMPACT */}
-                <section className="pdf-only hidden space-y-8 pt-12 border-t border-surface-container">
+                <section className="pdf-only hidden space-y-8 pt-20 border-t border-surface-container">
                   <div className="text-center mb-10">
                     <h2 className="text-2xl font-black text-black uppercase font-display tracking-tight mb-2">Terms & Conditions</h2>
                     <p className="text-[9px] font-bold text-secondary uppercase font-mono tracking-[0.5em]">LEGAL GOVERNANCE PROTOCOL</p>
@@ -994,7 +1031,6 @@ const Quotation = ({ editData = null, onSaved = null }) => {
               <div className="h-24 w-full bg-white"></div>
             </div>
           </div>
-        )}
       </div>
     </div>
   );

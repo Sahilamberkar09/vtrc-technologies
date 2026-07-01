@@ -3,6 +3,7 @@ import {
     createInquiry, 
     getInquiries, 
     deleteInquiry,
+    updateInquiryStatus,
     createProjectInquiry,
     getProjectInquiries,
     deleteProjectInquiry
@@ -14,6 +15,7 @@ const router = express.Router();
 // General inquiry routes
 router.post("/", createInquiry);
 router.get("/", protectRoute, getInquiries);
+router.patch("/:id/status", protectRoute, updateInquiryStatus);
 router.delete("/:id", protectRoute, deleteInquiry);
 
 // Project inquiry routes
