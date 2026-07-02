@@ -46,7 +46,7 @@ const StartProject = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/inquiries/project`, formData);
+      const response = await axios.post(`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/inquiries/project`, formData);
       if (response.data.success) {
         setSuccess(true);
         setFormData({

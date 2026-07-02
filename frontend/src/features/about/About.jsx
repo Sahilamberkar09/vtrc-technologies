@@ -1,217 +1,150 @@
-import React, { useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import {
-  FiArrowRight,
-  FiTerminal,
-  FiLayers,
-  FiActivity,
-  FiGlobe,
-} from "react-icons/fi";
-import LogoAnimation from "../../components/ui/LogoAnimation";
-
-/* ── ASSETS ── */
 import lionImg from "../../assets/Lion.jpg";
 
-const Pillar = ({ title, subtitle, icon: Icon, delay }) => (
-  <motion.div className="group relative p-1 border-l border-white/10 hover:border-white transition-colors">
-    <div className="pl-8">
-      <Icon
-        className="text-white mb-6 opacity-30 group-hover:opacity-100 transition-opacity"
-        size={28}
-      />
-      <h3
-        className="text-2xl font-bold mb-2 tracking-tighter uppercase"
-        style={{ fontFamily: "Orbitron, sans-serif" }}
-      >
-        {title}
-      </h3>
-      <p className="text-white/40 group-hover:text-white/70 transition-colors leading-relaxed font-light">
-        {subtitle}
-      </p>
-    </div>
-  </motion.div>
-);
-
 const About = () => {
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
-  });
-
-  const xLeft = useTransform(scrollYProgress, [0, 1], ["0%", "-20%"]);
-  const xRight = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  return (
-    <div
-      ref={containerRef}
-      className="bg-[#000000] text-white selection:bg-white selection:text-black"
-    >
-      {/* ── 1. THE KINETIC HEADER ── */}
-      <section className="relative h-screen flex flex-col justify-center items-center px-6 overflow-hidden">
-        <motion.div
-          style={{ x: xLeft }}
-          className="absolute top-20 left-0 whitespace-nowrap opacity-[0.03] select-none pointer-events-none"
-        >
-          <span className="text-[15vw] font-black uppercase tracking-tighter">
-            Architects of Code — Architects of Code —
-          </span>
-        </motion.div>
+  const pillars = [
+    {
+      title: "Zero-Latency",
+      subtitle: "We optimize for the microsecond. Our codebases aren't just functional; they're surgically efficient."
+    },
+    {
+      title: "Brutalist Design",
+      subtitle: "Stripping away the noise. We build digital structures that are bold, functional, and unapologetic."
+    },
+    {
+      title: "Deep Logic",
+      subtitle: "Beyond CRUD apps. We engineer proprietary algorithms that solve actual business friction."
+    },
+    {
+      title: "Borderless",
+      subtitle: "Infrastructure built for a planetary scale. High availability, anywhere on the grid."
+    }
+  ];
 
-        <div className="z-10 text-center">
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-white/40 text-xs font-bold tracking-[1em] uppercase mb-6 block"
-          >
-            VTRC / Technical Manifesto
-          </motion.span>
-          <h1
-            className="text-[clamp(3rem,10vw,8rem)] font-black leading-[0.85] uppercase italic"
-            style={{ fontFamily: "Orbitron, sans-serif" }}
-          >
+  return (
+    <main className="bg-[#faf9f9] text-[#1a1c1c] min-h-screen overflow-x-hidden">
+      <div className="w-full max-w-[1440px] mx-auto px-5 md:px-8 lg:px-16 pt-14 md:pt-20 pb-24">
+
+        {/* ── HERO ── */}
+        <section className="mb-16">
+          {/* Label badge */}
+          <div className="mb-5 inline-flex items-center gap-2 px-3 py-1 border border-black">
+            <span className="w-2 h-2 rounded-full bg-black inline-block" />
+            <span className="font-['JetBrains_Mono'] text-[11px] font-medium uppercase tracking-widest text-black">
+              Technical Manifesto // VTRC
+            </span>
+          </div>
+
+          {/* Heading */}
+          <h1 className="font-['Syne'] text-[clamp(32px,5vw,68px)] leading-[1] tracking-[-0.03em] font-extrabold text-black uppercase m-0 mb-6">
             Kill the <br />
-            <span className="text-transparent bg-clip-text bg-linear-to-b from-white to-white/20">
+            <span className="italic text-transparent" style={{ WebkitTextStroke: '2px black' }}>
               Ordinary.
             </span>
           </h1>
-        </div>
 
-        <motion.div
-          style={{ x: xRight }}
-          className="absolute bottom-20 right-0 whitespace-nowrap opacity-[0.03] select-none pointer-events-none"
-        >
-          <span className="text-[15vw] font-black uppercase tracking-tighter text-white">
-            VTRC TECHNOLOGIES — VTRC TECHNOLOGIES —
-          </span>
-        </motion.div>
-      </section>
-
-      {/* ── 2. THE ENGINEERING PILLARS ── */}
-      <section className="py-32 px-6 md:px-20 border-y border-white/05 bg-[#050505]">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          <Pillar
-            icon={FiTerminal}
-            title="Zero-Latency"
-            subtitle="We optimize for the microsecond. Our codebases aren't just functional; they're surgically efficient."
-            delay={0.1}
-          />
-          <Pillar
-            icon={FiLayers}
-            title="Brutalist Design"
-            subtitle="Stripping away the noise. We build digital structures that are bold, functional, and unapologetic."
-            delay={0.2}
-          />
-          <Pillar
-            icon={FiActivity}
-            title="Deep Logic"
-            subtitle="Beyond CRUD apps. We engineer proprietary algorithms that solve actual business friction."
-            delay={0.3}
-          />
-          <Pillar
-            icon={FiGlobe}
-            title="Borderless"
-            subtitle="Infrastructure built for a planetary scale. High availability, anywhere on the grid."
-            delay={0.4}
-          />
-        </div>
-      </section>
-
-      {/* ── 3. THE NARRATIVE (IMAGE & CONTENT) ── */}
-      <section className="py-40 px-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-linear-to-r from-white/20 to-white/5 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-black border border-white/10">
-              <LogoAnimation />
-            </div>
-            {/* Floating Tech Tag */}
-            <div className="absolute -bottom-6 -right-6 bg-white text-black p-6 rounded-xl hidden md:block">
-              <p className="text-[10px] font-black uppercase tracking-widest leading-none">
-                Status: Operational
-              </p>
-              <p className="text-2xl font-black mt-2">NYC / 40.7128° N</p>
+          {/* Divider row */}
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-t-2 border-black pt-6">
+            <p className="font-['Geist'] text-[15px] leading-[1.7] text-[#5d5f5f] max-w-md m-0">
+              Most firms sell "digital transformation" as a buzzword. We treat it as a high-stakes engineering problem. VTRC was founded because the web got boring—cluttered with templates and slow-moving logic.
+            </p>
+            <div className="font-['JetBrains_Mono'] text-[12px] font-bold uppercase tracking-widest text-black bg-white px-4 py-2 border-2 border-black self-start md:self-auto">
+              Status: Operational
             </div>
           </div>
+        </section>
 
-          <div>
-            <h2
-              className="text-4xl md:text-6xl font-bold uppercase mb-8 leading-none"
-              style={{ fontFamily: "Orbitron, sans-serif" }}
+        {/* ── ENGINEERING PILLARS ── */}
+        <section className="mb-16 border-2 border-black bg-black grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[2px]">
+          {pillars.map((pillar, i) => (
+            <div
+              key={pillar.title}
+              className="px-6 md:px-8 py-8 flex flex-col gap-3 bg-white"
             >
-              The Anti-Agency <br />
-              <span className="text-white/40">Philosophy.</span>
+              <span className="font-['JetBrains_Mono'] text-[10px] font-bold text-black uppercase tracking-widest">
+                // 0{i + 1}
+              </span>
+              <h3 className="font-['Syne'] text-[24px] font-bold text-black uppercase m-0 leading-tight">
+                {pillar.title}
+              </h3>
+              <p className="font-['Geist'] text-[14px] leading-[1.6] text-[#5d5f5f] m-0">
+                {pillar.subtitle}
+              </p>
+            </div>
+          ))}
+        </section>
+
+        {/* ── NARRATIVE SECTION ── */}
+        <section className="mb-16 grid grid-cols-1 lg:grid-cols-2 gap-0 border-2 border-black bg-white">
+          <div className="p-8 md:p-12 lg:p-16 border-b-2 lg:border-b-0 lg:border-r-2 border-black flex flex-col justify-center">
+            <h2 className="font-['Syne'] text-[clamp(28px,4vw,48px)] leading-[1.1] font-bold uppercase text-black mb-8">
+              The Anti-Agency Philosophy.
             </h2>
-            <div className="space-y-6 text-white/60 text-lg font-light leading-relaxed">
+            <div className="space-y-6 font-['Geist'] text-[16px] leading-[1.7] text-[#5d5f5f]">
               <p>
-                Most firms sell "digital transformation" as a buzzword. We treat
-                it as a high-stakes engineering problem. VTRC was founded
-                because the web got boring—cluttered with templates and
-                slow-moving logic.
+                We are a lean collective of elite technical architects. When you work with us, you aren't talking to account managers; you're talking to the people writing the kernels of your next ecosystem.
               </p>
               <p>
-                We are a lean collective of elite technical architects. When you
-                work with us, you aren't talking to account managers; you're
-                talking to the people writing the kernels of your next
-                ecosystem.
+                We build digital structures that are bold, functional, and unapologetic. No noise, just pure architectural integrity.
               </p>
             </div>
 
-            <div className="mt-12 flex items-center gap-6 p-6 border border-white/05 rounded-2xl bg-white/02 backdrop-blur-sm">
+            <div className="mt-12 inline-flex items-center gap-5 p-4 border-2 border-black bg-[#faf9f9] w-fit">
               <img
                 src={lionImg}
                 alt="Founder"
-                className="w-16 h-16 rounded-full object-cover border border-white/20"
+                className="w-14 h-14 object-cover border-2 border-black grayscale"
               />
               <div>
-                <h4 className="text-white font-bold uppercase tracking-widest text-sm">
+                <h4 className="font-['JetBrains_Mono'] text-black font-bold uppercase tracking-widest text-[12px] m-0 mb-1">
                   VTRC Founders
                 </h4>
-                <p className="text-white/40 text-xs italic">
+                <p className="font-['Geist'] text-[#5d5f5f] text-[13px] italic m-0">
                   "We build the tools we wish we had."
                 </p>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+          
+          <div className="bg-[#eeeeee] relative overflow-hidden flex items-center justify-center min-h-[300px] lg:min-h-full p-8">
+            <h1 className="font-['Syne'] text-[clamp(4rem,8vw,8rem)] text-black font-extrabold uppercase leading-[0.8] text-center opacity-10 select-none">
+              VTRC<br/>
+              ARCH<br/>
+              ITECTS
+            </h1>
+          </div>
+        </section>
 
-      {/* ── 4. THE VOID (FINAL CALL) ── */}
-      <section className="py-40 px-6 relative overflow-hidden bg-white text-black">
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          <h2 className="text-6xl md:text-9xl font-black uppercase tracking-tighter mb-8 leading-[0.8]">
-            Build <br /> The Void.
-          </h2>
-          <p className="text-xl font-bold mb-12 max-w-lg mx-auto uppercase tracking-tight">
-            We are currently accepting high-impact partnerships for the next
-            fiscal quarter.
-          </p>
-          <Link
-            to="/contact-us"
-            className="group relative inline-flex items-center gap-8 bg-black text-white px-10 py-5 rounded-full overflow-hidden"
-          >
-            <span className="relative z-10 font-bold uppercase tracking-widest">
+        {/* ── CTA ── */}
+        <section className="mt-5 border-2 border-black bg-black text-white px-6 md:px-12 py-12 md:py-16 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+          <div>
+            <p className="font-['JetBrains_Mono'] text-[11px] font-medium uppercase tracking-widest text-white/50 m-0 mb-3">
+              Build The Void.
+            </p>
+            <h2 className="font-['Syne'] text-[clamp(24px,3.5vw,44px)] leading-[1.1] font-bold uppercase text-white m-0">
               Secure Your Slot
-            </span>
-            <FiArrowRight
-              className="relative z-10 group-hover:translate-x-2 transition-transform"
-              size={24}
-            />
-            <motion.div
-              className="absolute inset-0 bg-white/20"
-              initial={{ x: "-100%" }}
-              whileHover={{ x: 0 }}
-              transition={{ type: "tween" }}
-            />
-          </Link>
-        </div>
-      </section>
-    </div>
+            </h2>
+            <p className="font-['Geist'] text-[14px] leading-[1.7] text-white/60 mt-4 m-0 max-w-md">
+              We are currently accepting high-impact partnerships for the next fiscal quarter.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+            <Link
+              to="/contact-us"
+              className="bg-white text-black px-8 py-4 font-['JetBrains_Mono'] text-[12px] font-bold uppercase border-2 border-white hover:bg-transparent hover:text-white transition-all duration-300 tracking-widest whitespace-nowrap"
+            >
+              Contact Strategy Team
+            </Link>
+          </div>
+        </section>
+
+      </div>
+    </main>
   );
 };
 

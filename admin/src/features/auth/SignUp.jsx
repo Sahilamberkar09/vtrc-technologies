@@ -114,10 +114,10 @@ const SignUp = () => {
   };
 
   return (
-    <div className="h-[100dvh] w-full flex flex-col bg-black overflow-hidden font-body select-none">
+    <div className="h-[100dvh] w-full flex flex-col lg:flex-row bg-black overflow-hidden font-body select-none">
 
-      {/* ══ HERO — 36% of viewport (shorter for 3 fields) ═ */}
-      <div className="relative flex-none" style={{ height: "36%" }}>
+      {/* ══ HERO ═ */}
+      <div className="relative flex-none pb-10 lg:pb-0 lg:h-full lg:w-1/2 lg:flex lg:flex-col">
         <HeroBg />
 
         {/* Brand bar */}
@@ -148,8 +148,7 @@ const SignUp = () => {
           initial={{ opacity: 0, scale: 0.88 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.08, ease: "easeOut" }}
-          className="relative z-10 flex flex-col items-center justify-center gap-3"
-          style={{ height: "calc(100% - 64px)" }}
+          className="relative z-10 flex flex-col items-center justify-center gap-3 mt-6 lg:mt-0 lg:flex-1"
         >
           {/* Icon card */}
           <div className="relative">
@@ -175,19 +174,19 @@ const SignUp = () => {
 
       {/* ══ FORM SHEET — natural flow, CTA pinned with mt-auto */}
       <motion.div
-        initial={{ y: "100%" }}
-        animate={{ y: 0 }}
+        initial={{ y: "100%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", damping: 26, stiffness: 220, delay: 0.05 }}
-        className="flex-1 bg-white rounded-t-[2rem] flex flex-col overflow-hidden"
+        className="flex-1 lg:flex-none lg:w-1/2 bg-white rounded-t-[2rem] lg:rounded-t-none lg:rounded-l-[2rem] flex flex-col overflow-hidden"
         style={{ boxShadow: "0 -24px 60px rgba(0,0,0,0.35)" }}
       >
         {/* Drag handle */}
-        <div className="flex justify-center pt-3 shrink-0">
+        <div className="flex justify-center pt-3 shrink-0 lg:hidden">
           <div className="w-10 h-1 bg-slate-200 rounded-full" />
         </div>
 
         {/* Inner — natural flow */}
-        <div className="flex-1 flex flex-col px-7 pt-5 pb-7 min-h-0 overflow-hidden">
+        <div className="flex-1 flex flex-col px-7 pt-5 pb-7 lg:px-16 lg:justify-center min-h-0 overflow-y-auto">
 
           {/* Sheet header */}
           <motion.div
@@ -276,7 +275,7 @@ const SignUp = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.42, duration: 0.3 }}
-            className="mt-auto pt-5 space-y-4"
+            className="mt-auto lg:mt-8 pt-5 space-y-4"
           >
             <button
               type="submit"

@@ -76,7 +76,7 @@ app.get("/", (req, res) => {
 });
 
 // Start Server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 
 server.listen(PORT, async () => {
   try {

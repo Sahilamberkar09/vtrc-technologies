@@ -12,7 +12,7 @@ const FeaturedWork = () => {
 
   const fetchFeaturedProjects = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/projects?featured=true`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/projects?featured=true`);
       if (response.data.success) {
         setFeaturedProjects(response.data.data.slice(0, 3)); // Limit to first 3 featured
       }

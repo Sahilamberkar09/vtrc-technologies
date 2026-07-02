@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 
-const API = import.meta.env.VITE_API_URL;
+const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
 const OTP_LENGTH = 6;
 const RESEND_COOLDOWN = 60; // seconds
 

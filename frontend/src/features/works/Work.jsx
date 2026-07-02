@@ -56,7 +56,7 @@ const Work = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/projects`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/projects`);
       if (response.data.success) {
         setProjects(response.data.data);
       }

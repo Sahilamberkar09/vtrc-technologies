@@ -55,7 +55,7 @@ const Application = () => {
     if (formData.jobId) data.append('jobId', formData.jobId);
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/careers/applications`, data, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/careers/applications`, data, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
