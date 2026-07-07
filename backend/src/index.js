@@ -42,6 +42,7 @@ app.use(
       "https://vtrc-technologies-admin-tan.vercel.app",
       "https://vtrc-technologies-tau.vercel.app",
       "http://localhost",
+      "https://localhost",
     "capacitor://localhost",
       process.env.FRONTEND_URL,
       process.env.ADMIN_URL,
